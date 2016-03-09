@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <ExecutablePath>E:\Program Files\MATLAB\R2014a\bin\win64;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>E:\Program Files\MATLAB\R2014a\extern\include;E:\Program Files\MATLAB\R2014a\extern\include\win64;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\Program Files\MATLAB\R2014a\extern\lib\win64\microsoft;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmat.lib;libmx.lib;libmex.lib;libeng.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
