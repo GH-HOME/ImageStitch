@@ -51,6 +51,7 @@ void removeRepeatPts(vector<cv::Point2f>quaryPts, vector<cv::Point2f>&trainPts);
 bool removeRepeatPtsInoneVec(vector<cv::Point2f>&quaryPts, vector<cv::Point2f>&trainPts);
 void findcorners(cv::Mat image, int num_corners, vector<cv::Point>&corners);
 Rect findRect(vector<cv::Point>corners);
+cv::Mat circleMatrix(int radius);
 #endif
 
 

@@ -551,7 +551,7 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	{
 		for (int j = 0; j < image_gray.cols; j++)
 		{
-			if (image_gray.at<uchar>(i, j) > 10)
+			if (image_gray.at<uchar>(i, j) > 5)
 			{
 				maskresult.at<uchar>(i, j) = 255;
 			}
@@ -563,7 +563,7 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 		}
 	}
 	cv::Mat mask_erode;
-	erode(maskresult, mask_erode, Mat(),Point(-1,-1),4); //这里是为了去除mask周边的一些噪声
+	erode(maskresult, mask_erode, Mat(),Point(-1,-1),15); //这里是为了去除mask周边的一些噪声
 	mask = mask_erode.clone();
 }
 
@@ -720,14 +720,30 @@ Rect findRect(vector<cv::Point>corners)
 		br.y = max(br.y, corners[i].y);
 	}
 
-	cout << corners[0] << endl;
-	cout << corners[1] << endl;
-	cout << corners[2] << endl;
-	cout << corners[3] << endl;
-
-	cout << tl << endl;
-	cout << br << endl;
-	system("pause");
-
 	return Rect(tl, br);
+}
+
+
+cv::Mat circleMatrix(int radius)
+{
+	int width = 2 * radius;
+	int height = 2 * radius;
+	cv::Mat mask(width, height, CV_8UC1, cv::Scalar(0));
+	cv::Point2f center(radius, radius);
+	for (int i = 0; i < width; i++)
+	{
+		for (int j = 0; j < height; j++)
+		{
+			cv::Point2f pt(i, j);
+			if (norm(pt-center)<radius)
+			{
+				mask.at<double>(j, i) = 1;
+			}
+			else
+			{
+				mask.at<double>(j, i) = 0;
+			}
+		}
+	}
+	return mask;
 }

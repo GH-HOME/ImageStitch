@@ -39,7 +39,7 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 		img_warped.convertTo(img_warped_s, CV_16S);
 		img_warped.release();
 
-		dilate(mask_graphcut[img_idx], dilated_mask, Mat(10, 10, CV_8U));
+		dilate(mask_graphcut[img_idx], dilated_mask, Mat(15, 15, CV_8U));
 		/*sprintf(str, "dilate_%d.png", img_idx);
 		imwrite(str, dilated_mask);*/
 
@@ -55,9 +55,9 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 			Size dst_sz = resultRoi(corners, sizes).size();
 
 			Rect test = resultRoi(corners, sizes);
-			cout << "resultRoi    " << test << endl;
+			/*cout << "resultRoi    " << test << endl;
 			cout << " dst_sz    " << dst_sz << endl;
-			cout << "dst_sz.area()      " << dst_sz.area() << endl;
+			cout << "dst_sz.area()      " << dst_sz.area() << endl;*/
 			float blend_width = sqrt(static_cast<float>(dst_sz.area())) * blend_strength / 100.f;
 			cout << "blend_width    " << blend_width << endl;
 			if (blend_width < 1.f)
@@ -75,10 +75,10 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 				LOGLN("Feather blender, sharpness: " << fb->sharpness());
 			}
 			blender->prepare(corners, sizes);
-			cout << "blender->prepare sizes    " << sizes[0] << endl;
+			/*cout << "blender->prepare sizes    " << sizes[0] << endl;
 			cout << "corners      " << corners[0] << endl;
 			cout << "blender->prepare sizes    " << sizes[1] << endl;
-			cout << "corners      " << corners[1] << endl;
+			cout << "corners      " << corners[1] << endl;*/
 
 		}
 
@@ -89,12 +89,12 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 	Mat result, result_mask;
 	blender->blend(result, result_mask);
 
-	imwrite("result_mask.png", result_mask);
+	//imwrite("result_mask.png", result_mask);
 	LOGLN("Compositing, time: " << ((getTickCount() - t) / getTickFrequency()) << " sec");
 
 	result.convertTo(result, CV_8UC3);
-	imshow("result", result);
-	waitKey(20);
+	//imshow("result", result);
+	//waitKey();
 	return result;
 
 	
