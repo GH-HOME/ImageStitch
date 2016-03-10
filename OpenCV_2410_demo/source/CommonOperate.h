@@ -45,10 +45,12 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask);
 void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask, int value);
 bool isPointinLine(cv::Point2f pt, cv::Point2f V1, cv::Point2f V2, double threshold = 0);
 void getMaskShapeImage(cv::Mat SrcIm, cv::Mat &DstIm, cv::Mat mask);
-void drawfeatures(cv::Mat &image, vector<cv::Point2f>features);
+void drawfeatures(cv::Mat &image, vector<cv::Point>features);
 bool isPointInVec(cv::Point2f pt, vector<cv::Point2f>vec);
 void removeRepeatPts(vector<cv::Point2f>quaryPts, vector<cv::Point2f>&trainPts);
 bool removeRepeatPtsInoneVec(vector<cv::Point2f>&quaryPts, vector<cv::Point2f>&trainPts);
+void findcorners(cv::Mat image, int num_corners, vector<cv::Point>&corners);
+Rect findRect(vector<cv::Point>corners);
 #endif
 
 

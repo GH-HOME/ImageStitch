@@ -16,6 +16,8 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 	sizes[1] = image_warpeds[1].size();
 	cout << sizes[0] << endl;
 
+
+
 	Ptr<ExposureCompensator> compensator = ExposureCompensator::createDefault(expos_comp_type);
 	compensator->feed(corners, image_warpeds, mask_warpeds);
 
@@ -31,18 +33,16 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 		img_warped = image_warpeds[img_idx].clone();
 		mask_warped = mask_warpeds[img_idx];
 		// Compensate exposure
-		compensator->apply(img_idx, corners[img_idx], img_warped, mask_warped);
+		//compensator->apply(img_idx, corners[img_idx], img_warped, mask_warped);
 
 
 		img_warped.convertTo(img_warped_s, CV_16S);
 		img_warped.release();
 
 		dilate(mask_graphcut[img_idx], dilated_mask, Mat(10, 10, CV_8U));
-		sprintf(str, "dilate_%d.png", img_idx);
-		imwrite(str, dilated_mask);
+		/*sprintf(str, "dilate_%d.png", img_idx);
+		imwrite(str, dilated_mask);*/
 
-		imshow("gh", dilated_mask);
-		waitKey();
 		//resize(dilated_mask, seam_mask, mask_warped.size());
 		mask_warped = dilated_mask & mask_warped;////////经过膨胀处理后的mask
 

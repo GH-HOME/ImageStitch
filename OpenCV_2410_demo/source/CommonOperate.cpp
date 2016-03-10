@@ -551,15 +551,20 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	{
 		for (int j = 0; j < image_gray.cols; j++)
 		{
-			if (image_gray.at<uchar>(i, j) != 0)
+			if (image_gray.at<uchar>(i, j) > 10)
 			{
 				maskresult.at<uchar>(i, j) = 255;
+			}
+			else
+			{
+				maskresult.at<uchar>(i, j) = 0;
 			}
 
 		}
 	}
-
-	mask = maskresult.clone();
+	cv::Mat mask_erode;
+	erode(maskresult, mask_erode, Mat(),Point(-1,-1),4); //这里是为了去除mask周边的一些噪声
+	mask = mask_erode.clone();
 }
 
 void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask,int value)
@@ -621,12 +626,12 @@ void getMaskShapeImage(cv::Mat SrcIm, cv::Mat &DstIm, cv::Mat mask)
 	image.copyTo(DstIm);
 }
 
-void drawfeatures(cv::Mat &image, vector<cv::Point2f>features)
+void drawfeatures(cv::Mat &image, vector<cv::Point>features)
 {
 	cv::Mat temp = image.clone();
-	cv::Scalar color2(255, 255, 255);
+	cv::Scalar color2(0, 255, 0);
 	int gap = 0;
-	int lineWidth = 1.5;
+	int lineWidth = 2;
 	for (int i = 0; i < features.size(); i++)
 	{
 		cv::circle(temp, cv::Point(features[i].x, features[i].y), lineWidth + 2, color2, -1);
@@ -689,4 +694,40 @@ bool removeRepeatPtsInoneVec(vector<cv::Point2f>&quaryPts, vector<cv::Point2f>&t
 	}
 	return true;
 
+}
+
+void findcorners(cv::Mat image, int num_corners,vector<cv::Point>&corners)
+{
+	// 改进的harris角点检测方法
+	goodFeaturesToTrack(image, corners,
+		num_corners,
+		//角点最大数目
+		0.05,
+		// 质量等级，这里是0.01*max（min（e1，e2）），e1，e2是harris矩阵的特征值
+		25);
+	// 两个角点之间的距离容忍度
+
+}
+Rect findRect(vector<cv::Point>corners)
+{
+	Point tl(numeric_limits<int>::max(), numeric_limits<int>::max());
+	Point br(numeric_limits<int>::min(), numeric_limits<int>::min());
+	for (size_t i = 0; i < corners.size(); ++i)
+	{
+		tl.x = min(tl.x, corners[i].x);
+		tl.y = min(tl.y, corners[i].y);
+		br.x = max(br.x, corners[i].x);
+		br.y = max(br.y, corners[i].y);
+	}
+
+	cout << corners[0] << endl;
+	cout << corners[1] << endl;
+	cout << corners[2] << endl;
+	cout << corners[3] << endl;
+
+	cout << tl << endl;
+	cout << br << endl;
+	system("pause");
+
+	return Rect(tl, br);
 }
