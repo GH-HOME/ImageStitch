@@ -52,6 +52,7 @@ bool removeRepeatPtsInoneVec(vector<cv::Point2f>&quaryPts, vector<cv::Point2f>&t
 void findcorners(cv::Mat image, int num_corners, vector<cv::Point>&corners);
 Rect findRect(vector<cv::Point>corners);
 cv::Mat circleMatrix(int radius);
+void findboun_rect(cv::Mat mask, vector<cv::Point>&corners);
 #endif
 
 

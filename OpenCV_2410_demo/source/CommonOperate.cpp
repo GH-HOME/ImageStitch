@@ -551,7 +551,7 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	{
 		for (int j = 0; j < image_gray.cols; j++)
 		{
-			if (image_gray.at<uchar>(i, j) > 5)
+			if (image_gray.at<uchar>(i, j) > 0)
 			{
 				maskresult.at<uchar>(i, j) = 255;
 			}
@@ -562,8 +562,13 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 
 		}
 	}
-	cv::Mat mask_erode;
-	erode(maskresult, mask_erode, Mat(),Point(-1,-1),15); //这里是为了去除mask周边的一些噪声
+	
+	cv::Mat mask_erode, mask_dilate;
+	
+	erode(maskresult, mask_erode, Mat(), Point(-1, -1), 5); //这里是为了去除mask周边的一些噪声
+	/*dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 10);
+	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 20);*/
+
 	mask = mask_erode.clone();
 }
 
@@ -729,21 +734,92 @@ cv::Mat circleMatrix(int radius)
 	int width = 2 * radius;
 	int height = 2 * radius;
 	cv::Mat mask(width, height, CV_8UC1, cv::Scalar(0));
-	cv::Point2f center(radius, radius);
+	cv::Point2f center(radius+0.5, radius+0.5);
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)
 		{
-			cv::Point2f pt(i, j);
-			if (norm(pt-center)<radius)
+			cv::Point2f pt(i+1, j+1);
+			double temp = norm(center - pt);
+
+			if (norm(center-pt)<radius)
 			{
-				mask.at<double>(j, i) = 1;
+				mask.at<uchar>(j, i) = 1;
 			}
 			else
 			{
-				mask.at<double>(j, i) = 0;
+				mask.at<uchar>(j, i) = 0;
 			}
 		}
 	}
 	return mask;
+}
+
+void findboun_rect(cv::Mat mask, vector<cv::Point>&corners)
+{
+	int height = mask.rows;
+	int width = mask.cols;
+
+	int top = 0, bottom = 0;
+	int left = 0,right = 0;
+
+	bool flag_t = false;
+	bool flag_b = false;
+	bool flag_l = false;
+	bool flag_r = false;
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			if (mask.at<uchar>(i,j)==255&&flag_t==false)
+			{
+				top = i;
+				flag_t = true;
+			}
+			if (mask.at<uchar>(height-i-1,j)==255&&flag_b==false)
+			{
+				bottom = height - i - 1;
+				flag_b = true;
+			}
+			if (flag_t&&flag_b)
+			{
+				break;
+			}
+		}
+	}
+
+	for (int j = 0; j < width; j++)
+	{
+		for (int i = 0; i < height; i++)
+		{
+		
+			if (mask.at<uchar>(i, j) == 255 && flag_l == false)
+			{
+				left = j;
+				flag_l = true;
+			}
+			if (mask.at<uchar>(i, width - j - 1) == 255 && flag_r == false)
+			{
+				right = width - j - 1;
+				flag_r = true;
+			}
+			if (flag_l&&flag_r)
+			{
+				break;
+			}
+		}
+	}
+
+	corners.resize(4);
+	corners[0] = cv::Point(left, top);
+	corners[1] = cv::Point(right, top);
+	corners[2] = cv::Point(left, bottom);
+	corners[3] = cv::Point(right, bottom);
+
+
+
+	/*cout << "left  " << left << "right   " << right << endl;
+	cout << "top  " << top << "bottom   " << bottom << endl;
+	system("pause");*/
 }

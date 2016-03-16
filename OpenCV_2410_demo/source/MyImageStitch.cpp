@@ -14,7 +14,6 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 	vector<Size> sizes(num_images);
 	sizes[0] = image_warpeds[0].size();
 	sizes[1] = image_warpeds[1].size();
-	cout << sizes[0] << endl;
 
 
 
@@ -33,17 +32,16 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 		img_warped = image_warpeds[img_idx].clone();
 		mask_warped = mask_warpeds[img_idx];
 		// Compensate exposure
-		//compensator->apply(img_idx, corners[img_idx], img_warped, mask_warped);
+		compensator->apply(img_idx, corners[img_idx], img_warped, mask_warped);
 
 
 		img_warped.convertTo(img_warped_s, CV_16S);
 		img_warped.release();
 
-		dilate(mask_graphcut[img_idx], dilated_mask, Mat(15, 15, CV_8U));
-		/*sprintf(str, "dilate_%d.png", img_idx);
-		imwrite(str, dilated_mask);*/
+		dilate(mask_graphcut[img_idx], dilated_mask, Mat(5,5,CV_8UC1));
+		
 
-		//resize(dilated_mask, seam_mask, mask_warped.size());
+		
 		mask_warped = dilated_mask & mask_warped;////////经过膨胀处理后的mask
 
 
@@ -55,9 +53,6 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 			Size dst_sz = resultRoi(corners, sizes).size();
 
 			Rect test = resultRoi(corners, sizes);
-			/*cout << "resultRoi    " << test << endl;
-			cout << " dst_sz    " << dst_sz << endl;
-			cout << "dst_sz.area()      " << dst_sz.area() << endl;*/
 			float blend_width = sqrt(static_cast<float>(dst_sz.area())) * blend_strength / 100.f;
 			cout << "blend_width    " << blend_width << endl;
 			if (blend_width < 1.f)
@@ -75,10 +70,6 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 				LOGLN("Feather blender, sharpness: " << fb->sharpness());
 			}
 			blender->prepare(corners, sizes);
-			/*cout << "blender->prepare sizes    " << sizes[0] << endl;
-			cout << "corners      " << corners[0] << endl;
-			cout << "blender->prepare sizes    " << sizes[1] << endl;
-			cout << "corners      " << corners[1] << endl;*/
 
 		}
 
@@ -93,8 +84,8 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 	LOGLN("Compositing, time: " << ((getTickCount() - t) / getTickFrequency()) << " sec");
 
 	result.convertTo(result, CV_8UC3);
-	//imshow("result", result);
-	//waitKey();
+	/*imshow("result", result);
+	waitKey(10);*/
 	return result;
 
 	
