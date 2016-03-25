@@ -551,7 +551,7 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	{
 		for (int j = 0; j < image_gray.cols; j++)
 		{
-			if (image_gray.at<uchar>(i, j) > 0)
+			if (image_gray.at<uchar>(i, j) > 1)
 			{
 				maskresult.at<uchar>(i, j) = 255;
 			}
@@ -566,8 +566,8 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	cv::Mat mask_erode, mask_dilate;
 	
 	erode(maskresult, mask_erode, Mat(), Point(-1, -1), 5); //这里是为了去除mask周边的一些噪声
-	/*dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 10);
-	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 20);*/
+	dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 20);
+	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 20);
 
 	mask = mask_erode.clone();
 }
