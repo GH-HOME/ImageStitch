@@ -566,8 +566,10 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	cv::Mat mask_erode, mask_dilate;
 	
 	erode(maskresult, mask_erode, Mat(), Point(-1, -1), 5); //这里是为了去除mask周边的一些噪声
-	dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 20);
-	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 20);
+	
+
+	dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 30);
+	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 30);
 
 	mask = mask_erode.clone();
 }

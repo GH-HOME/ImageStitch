@@ -4,7 +4,7 @@ using namespace std;
 using namespace cv;
 
 
-RobustMatcher::RobustMatcher() :m_ratio(0.7f), m_confidence(0.99), m_distance(7.0)
+RobustMatcher::RobustMatcher() :m_ratio(0.75f), m_confidence(0.99), m_distance(10.0)
 {
 	detector = new cv::SiftFeatureDetector();
 	extractor = new cv::SiftDescriptorExtractor();

@@ -3,6 +3,7 @@
 #include "MyDebug.h"
 #include "save.h"
 #include "MyImageStitch.h"
+#include "RobustMatcher.h"
 
 using namespace std;
 using namespace cv;
@@ -57,53 +58,26 @@ void writevideo(char*videoname, vector<cv::Mat>frames)
 
 
 
-int main(int argc,char *argv[])
-{
-	vector<cv::Mat>frames1, frames2, result;
-	readvideo("leftsmooth.avi", frames1);
-	readvideo("rightsmooth.avi", frames2);
-	/*readvideo(argv[1], frames1);
-	readvideo(argv[2], frames2);*/
-
-	
-	for (int i = 0; i < frames1.size(); i++)
-	{
-		cv::Mat left = frames1[i];
-		cv::Mat right = frames2[i];
-		cv::Mat resultIM = stitchgapIm(left, right);
-		
-		result.push_back(resultIM);
-	}
-
-	//writevideo(argv[3], result);
-	writevideo("out8.avi", result);
-
-
-	/*cv::Mat image0 = imread(".//left//k30.png");
-	cv::Mat image1 = imread(".//right//k30.png");
-	cv::Mat resultIM = stitchgapIm(image0, image1);*/
-	
-	
-}
-
-//int main(int argc, char *argv[])
+//int main(int argc,char *argv[])
 //{
-//	vector<cv::Mat>frames1,result;
-//	readvideo("ok.avi", frames1);
+//	vector<cv::Mat>frames1, frames2, result;
+//	readvideo("leftout.avi", frames1);
+//	readvideo("middleout.avi", frames2);
+//	/*readvideo(argv[1], frames1);
+//	readvideo(argv[2], frames2);*/
 //
-//	int framestart = 5;
-//	int frameend = 388;
-//	for (int i = framestart; i < frameend; i++)
+//	
+//	for (int i = 0; i < frames1.size(); i++)
 //	{
-//		if (i==303)
-//		{
-//			continue;
-//		}
-//		cv::Mat left = frames1[i].clone();
-//
-//		result.push_back(left);
+//		cv::Mat left = frames1[i];
+//		cv::Mat right = frames2[i];
+//		cv::Mat resultIM = stitchgapIm(left, right);
+//		
+//		result.push_back(resultIM);
 //	}
-//	writevideo("output.avi", result);
+//
+//	//writevideo(argv[3], result);
+//	writevideo("output2.avi", result);
 //
 //
 //	/*cv::Mat image0 = imread(".//left//k30.png");
@@ -112,6 +86,93 @@ int main(int argc,char *argv[])
 //	
 //	
 //}
+cv::Mat blending(cv::Mat image0, cv::Mat image1)
+{
+	vector<cv::Mat>images_warp, mask, mask_graph;
+	cv::Mat mask0, mask1;
+	getImageNon_ZeroMask(image0, mask0);
+	getImageNon_ZeroMask(image1, mask1);
+
+	cv::Mat result(mask1.size(), CV_8UC3);
+	for (int i = 0; i < mask0.rows; i++)
+	{
+		for (int j = 0; j < mask0.cols; j++)
+		{
+			//result.at<Vec3b>(i, j) = image1.at<Vec3b>(i, j);
+			if (mask0.at<uchar>(i, j) && mask1.at<uchar>(i, j))
+			{
+				result.at<Vec3b>(i, j)[0] = (image0.at<Vec3b>(i, j)[0] + image1.at<Vec3b>(i, j)[0]) / 2;
+				result.at<Vec3b>(i, j)[1] = (image0.at<Vec3b>(i, j)[1] + image1.at<Vec3b>(i, j)[1]) / 2;
+				result.at<Vec3b>(i, j)[2] = (image0.at<Vec3b>(i, j)[2] + image1.at<Vec3b>(i, j)[2]) / 2;
+			}
+			else if (mask0.at<uchar>(i, j))
+			{
+				result.at<Vec3b>(i, j) = image0.at<Vec3b>(i, j);
+			}
+			else
+			{
+				result.at<Vec3b>(i, j) = image1.at<Vec3b>(i, j);
+			}
+		}
+	}
+	return result;
+}
+
+
+int main(int argc, char *argv[])
+{
+	string videoname = "test1.avi";
+	string videoname2 = "left_smooth.avi";
+	string videoname1 = "right_smooth.avi";
+	printf("Read Video\n");
+	cout << "now read video..." << videoname1 << endl;
+	cv::VideoCapture capture(videoname1);
+	// check if video successfully opened
+	if (!capture.isOpened())
+	{
+		cerr << "The video can not open!";
+		return -1;
+		exit(0);
+	}
+
+	
+	printf("Read Video\n");
+	cout << "now read video" << videoname2 << endl;
+	cv::VideoCapture capture2(videoname2);
+	int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+	int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
+	// check if video successfully opened
+	if (!capture2.isOpened())
+	{
+		cerr << "The video can not open!";
+		return -1;
+		exit(0);
+	}
+
+	cv::VideoWriter outVideoWriter;
+	outVideoWriter.open(videoname, CV_FOURCC('X', 'V', 'I', 'D'), 30, cv::Size(video_width+2*40, video_height+2*40));
+
+	cv::Mat frame1,frame2; // current video frame
+	printf("extract frames...");
+	int frame_count = 0;
+	while (capture.read(frame1) && capture2.read(frame2))
+	{
+		cv::Mat frame_copy1 = frame1.clone();
+		cv::Mat frame_copy2 = frame2.clone();
+		cv::Mat image1_gap, image2_gap;
+		addImagegap(frame_copy1, 40, 40, image1_gap);
+		addImagegap(frame_copy2, 40, 40, image2_gap);
+		cv::Mat resultIM = blending(image1_gap, image2_gap);
+		outVideoWriter << resultIM;
+		printf("%04d\b\b\b\b", frame_count);
+		frame_count++;
+	}
+	capture.release();
+	capture2.release();
+	outVideoWriter.release();
+
+
+}
 
 cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1)
 {
@@ -125,26 +186,24 @@ cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1)
 	int addwidthMask = 10;
 	cv::Mat mask0_di, mask1_di;
 
-	erode(mask0, mask0_e, Mat(), Point(-1, -1), 20);
-	erode(mask1, mask1_e, Mat(), Point(-1, -1), 20);
-	/*dilate(mask0, mask0_di, Mat(addwidthMask, addwidthMask, CV_8U));
-	dilate(mask1, mask1_di, Mat(addwidthMask, addwidthMask, CV_8U));*/
 
 
-
+	//method1
+	/*erode(mask0, mask0_e, Mat(), Point(-1, -1), 10);
+	erode(mask1, mask1_e, Mat(), Point(-1, -1), 10);
 	cv::Mat allmask = mask0_e | mask1_e;
 	cv::Mat graph_mask0 = allmask - mask1_e;
-	//dilate(graph_mask0, mask0_di, Mat(),Point(-1,-1),25);
-	//graph_mask0 = mask0_di&mask0_e;
+	cv::Mat graph_mask1 = allmask - graph_mask0;*/
+
+	//method2
+	erode(mask0, mask0, Mat(), Point(-1, -1), 2);
+	erode(mask1, mask1, Mat(), Point(-1, -1), 2);
+
+	cv::Mat allmask = mask0 | mask1;
+	cv::Mat graph_mask0 = allmask - mask1;
+	dilate(graph_mask0, mask0_di, Mat(),Point(-1,-1),30);
+	graph_mask0 = mask0_di&mask0;
 	cv::Mat graph_mask1 = allmask - graph_mask0;
-
-
-
-	imshow("graph_mask0.png", graph_mask0);
-	imshow("graph_mask1.png", graph_mask1);
-
-	/*imwrite("mask0.png", mask0);
-	imwrite("mask1.png", mask1);*/
 
 
 
@@ -290,3 +349,5 @@ cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1,int index)
 	return result_final;
 
 }
+
+
