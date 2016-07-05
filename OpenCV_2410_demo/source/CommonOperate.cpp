@@ -897,7 +897,7 @@ double addROIPix(cv::Mat image, cv::Mat mask)
 
 	sort(gradient_vec.begin(),gradient_vec.end());
 
-	int num = gradient_vec.size()*0.3;
+	int num = gradient_vec.size()*0.5;
 
 	for (int i = gradient_vec.size(); i > gradient_vec.size()-num; i--)
 	{
@@ -913,8 +913,8 @@ double addROIPix(cv::Mat image, cv::Mat mask)
 cv::Mat getMaskcontour(cv::Mat mask,int width)
 {
 	cv::Mat mask_small,mask_big;
-	erode(mask, mask_small, Mat(), Point(-1, -1), width+2);
-	erode(mask, mask_big, Mat(), Point(-1, -1), width+1);
+	erode(mask, mask_small, Mat(), Point(-1, -1), width+3);
+	erode(mask, mask_big, Mat(), Point(-1, -1), width+2);
 
 	cv::Mat result = mask_big - mask_small;
 	return result;
@@ -931,7 +931,7 @@ void SubMatrix(cv::Mat matrix1, cv::Mat matrix2,cv::Mat& result)
 		{
 			temp.at<double>(i, j) = matrix1.at<double>(i, j) - matrix2.at<double>(i, j);
 			
-			/*if (temp.at<double>(i, j)>100)
+			/*if (temp.at<double>(i, j)>10)
 			{
 				cout << " "<<i  << "  "<< j << endl;
 				system("pause");
@@ -942,4 +942,74 @@ void SubMatrix(cv::Mat matrix1, cv::Mat matrix2,cv::Mat& result)
 	result = temp.clone();
 
 
+}
+
+//double subROIPix(cv::Mat image1, cv::Mat image2, cv::Mat mask)
+//{
+//	cv::Mat I1_gray, I2_gray;
+//	int sum_nonzero_Pix = 0;
+//
+//	double sum = 0.0;
+//
+//	/*cvtColor(image1, I1_gray, CV_BGR2GRAY);
+//	cvtColor(image2, I2_gray, CV_BGR2GRAY);*/
+//
+//	I1_gray = image1.clone();
+//	I2_gray = image2.clone();
+//
+//	for (int i = 0; i < mask.rows; i++)
+//	{
+//		for (int j = 0; j < mask.cols; j++)
+//		{
+//
+//			if (mask.at<uchar>(i, j) == 255)
+//			{
+//				sum += abs(I1_gray.at<double>(i, j) - I2_gray.at<double>(i, j));
+//				sum_nonzero_Pix++;
+//
+//			}
+//		}
+//	}
+//
+//	return sum / sum_nonzero_Pix;
+//}
+
+double subROIPix(cv::Mat image1, cv::Mat image2, cv::Mat mask)
+{
+	cv::Mat I1_gray, I2_gray;
+	int sum_nonzero_Pix = 0;
+
+	double sum = 0.0;
+
+	/*cvtColor(image1, I1_gray, CV_BGR2GRAY);
+	cvtColor(image2, I2_gray, CV_BGR2GRAY);*/
+
+	I1_gray = image1.clone();
+	I2_gray = image2.clone();
+
+	vector<double>gradient_vec;
+	for (int i = 0; i < mask.rows; i++)
+	{
+		for (int j = 0; j < mask.cols; j++)
+		{
+
+			if (mask.at<uchar>(i, j) == 255)
+			{
+				gradient_vec.push_back(abs(I1_gray.at<double>(i, j) - I2_gray.at<double>(i, j)));
+
+			}
+		}
+	}
+
+	sort(gradient_vec.begin(), gradient_vec.end());
+
+	int num = gradient_vec.size()*0.2;
+
+	for (int i = gradient_vec.size(); i > gradient_vec.size() - num; i--)
+	{
+		sum += gradient_vec[i - 1];
+		sum_nonzero_Pix++;
+	}
+
+	return sum / sum_nonzero_Pix;
 }

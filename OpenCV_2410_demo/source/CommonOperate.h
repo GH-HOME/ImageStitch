@@ -57,6 +57,7 @@ cv::Mat calcgradient(const cv::Mat& img);
 cv::Mat getMaskcontour(cv::Mat mask, int width);
 double addROIPix(cv::Mat image, cv::Mat mask);
 void SubMatrix(cv::Mat matrix1, cv::Mat matrix2, cv::Mat& result);
+double subROIPix(cv::Mat image1, cv::Mat image2, cv::Mat mask);
 #endif
 
 
