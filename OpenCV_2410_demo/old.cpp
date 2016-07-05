@@ -19,7 +19,7 @@ double max_gradient_all = 0.0;
 double min_gradient_all = 10000000;
 
 
-int readvideo(char*videoname,vector<cv::Mat>&frames)
+int readvideo(char*videoname, vector<cv::Mat>&frames)
 {
 	printf("Read Video\n");
 	cout << "now read video" << videoname << endl;
@@ -31,7 +31,7 @@ int readvideo(char*videoname,vector<cv::Mat>&frames)
 		return -1;
 		exit(0);
 	}
-	
+
 	cv::Mat frame; // current video frame
 	printf("extract frames...");
 	int frame_count = 0;
@@ -154,12 +154,10 @@ cv::Mat blending(cv::Mat image0, cv::Mat image1)
 #if 1
 int main(int argc, char *argv[])
 {
-	
+
 	string videoname = "output6.avi";
-	string videoname3 = ".//2//left.avi";
-	string videoname4 = ".//2//right.avi";
-	string videoname1 = ".//2//outleft.avi";
-	string videoname2 = ".//2//outright.avi";
+	string videoname2 = "outleft.avi";
+	string videoname1 = "outright.avi";
 	printf("Read Video\n");
 	cout << "now read video..." << videoname1 << endl;
 	cv::VideoCapture capture(videoname1);
@@ -171,13 +169,12 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 
-	
+
 	printf("Read Video\n");
 	cout << "now read video" << videoname2 << endl;
 	cv::VideoCapture capture2(videoname2);
 
-	cv::VideoCapture capture3(videoname3);
-	cv::VideoCapture capture4(videoname4);
+	cv::VideoCapture capture3(videoname1);
 	int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
 	int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
 	// check if video successfully opened
@@ -189,65 +186,15 @@ int main(int argc, char *argv[])
 	}
 
 	cv::VideoWriter outVideoWriter;
-	outVideoWriter.open(videoname, CV_FOURCC('X', 'V', 'I', 'D'), 30, cv::Size(video_width+2*40, video_height+2*40));
+	outVideoWriter.open(videoname, CV_FOURCC('X', 'V', 'I', 'D'), 30, cv::Size(video_width + 2 * 40, video_height + 2 * 40));
 
-	cv::Mat frame1,frame2,frame3,frame4; // current video frame
+	cv::Mat frame1, frame2; // current video frame
 	printf("extract frames...");
 	int frame_count = 0;
 
-	while (capture3.read(frame3) && capture4.read(frame4))
-	{
-
-		
-		printf("%04d\b\b\b\b", frame_count);
-		frame_count++;
-
-		//cout << "frame index    " << frame_count << endl;
-
-		cv::Mat gray_image = calcgradient(frame3);
-
-		cv::Mat gray_image2 = calcgradient(frame4);
-
-		Scalar sum_temp1 = sum(gray_image2);
-		double sum_gradient = sum_temp1.val[0];
-
-		Scalar sum_temp = sum(gray_image);
-		double sum_gradient2 = sum_temp.val[0];
-
-		if (sum_gradient>max_gradient_all)
-		{
-			max_gradient_all = sum_gradient;
-		}
-		if (sum_gradient2>max_gradient_all)
-		{
-			max_gradient_all = sum_gradient2;
-		}
-
-		if (sum_gradient < min_gradient_all)
-		{
-			min_gradient_all = sum_gradient;
-		}
-		if (sum_gradient2 < min_gradient_all)
-		{
-			min_gradient_all = sum_gradient2;
-		}
 
 
-		
 
-		
-	}
-
-	
-	min_gradient_all = min_gradient_all / (640.0 * 360.0);
-	max_gradient_all /= (640.0 * 360.0);
-	//min_gradient_all = max_gradient_all - min_gradient_all;
-	min_gradient_all = 0.0;
-
-	cout<<"max_gradient_all  " << max_gradient_all << endl;
-	cout <<"min_gradient_all  "<< min_gradient_all << endl;
-	
-	frame_count = 0;
 	while (capture.read(frame1) && capture2.read(frame2))
 	{
 		cv::Mat frame_copy1 = frame1.clone();
@@ -256,27 +203,20 @@ int main(int argc, char *argv[])
 		cv::Mat image1_gap, image2_gap;
 		addImagegap(frame_copy1, 40, 40, image1_gap);
 		addImagegap(frame_copy2, 40, 40, image2_gap);
-
-		//if (frame_count>93 && frame_count<293)
-		{
-			cv::Mat resultIM = stitchgapIm(image1_gap, image2_gap);
-		}
-		
-		//outVideoWriter << resultIM;
+		cv::Mat resultIM = stitchgapIm(image1_gap, image2_gap);
+		outVideoWriter << resultIM;
 		printf("%04d\b\b\b\b", frame_count);
 		frame_count++;
 
 		cout << "frame index    " << frame_count << endl;
-		
 
-		double myValue = (mymax - min_gradient_all) / (max_gradient_all - min_gradient_all) * 10;
-		printf("max value is %lf\n", myValue);
-		
-		
-		
+
+
+		printf("max value is %lf\n", mymax);
+
+
+
 	}
-
-
 	system("pause");
 
 	capture.release();
@@ -309,6 +249,8 @@ cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1)
 	cv::Mat allmask = mask0_e | mask1_e;
 	cv::Mat graph_mask0 = allmask - mask1_e;
 	cv::Mat graph_mask1 = allmask - graph_mask0;
+
+
 
 
 	//method2
@@ -366,58 +308,65 @@ cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1)
 
 	cv::Mat overlapmask = mask0_e&mask1_e;
 
+	cv::Mat gray_image = calcgradient(image0);
 
-	cv::Mat image11;
-	getMaskShapeImage(image1, image11, graph_mask1);
-	
-	cv::Mat gray_image = calcgradient(image11);
+	Scalar sum_temp = sum(gray_image);
+
+	double sum_gradient = sum_temp.val[0];
+
+
 
 
 	cv::Mat gray_result = calcgradient(result_final);
-	cv::Mat mask_contour = getMaskcontour(overlapmask, 1);
+	cv::Mat mask_contour = getMaskcontour(overlapmask, 2);
 
+
+
+	/*gray_image.convertTo(gray_image, CV_8UC1);
+	gray_result.convertTo(gray_result, CV_8UC1);
+	imwrite("gray_image.png", gray_image);
+	imwrite("mask0_e.png", mask0_e);
+	imwrite("gray_result.png", gray_result);
+	imwrite("mask_contour.png", mask_contour);*/
 
 	cv::Mat mask_shape1, mask_shape2;
 	getMaskShapeImage(image0, mask_shape1, mask_contour);
 	getMaskShapeImage(result_final, mask_shape2, mask_contour);
-	
+
+
 	imwrite("mask_shape2.png", mask_shape2);
 	imwrite("mask_shape1.png", mask_shape1);
 	imwrite("image0.png", image0); imwrite("result_final.png", result_final);
 
-
-	cv::Mat sub_image;
-	
-	SubMatrix(gray_result, gray_image, sub_image);
+	double orgin_value = addROIPix(gray_image, mask_contour);
+	double now_value = addROIPix(gray_result, mask_contour);
 
 
 
-	double orgin_value = addROIPix(sub_image, mask_contour);
-	//double now_value = addROIPix(gray_result, mask_contour);
-
-	
-	cout << "orgin_value     " << orgin_value << endl;
-	if (mymax<orgin_value)
+	if (mymax<abs(orgin_value - now_value))
 	{
-		/*if (mymax>200)
+		if (mymax>10)
 		{
 			my_count++;
 			cout << "bad   " << my_count << endl;
-		}*/
-		//else
-		{
-			mymax = orgin_value;
+
 		}
-		
+		else
+		{
+			mymax = abs(orgin_value - now_value);
+		}
+
 	}
 
+
+	
 
 	return result_final;
 
 }
 
 
-cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1,int index)
+cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1, int index)
 {
 	vector<cv::Mat>images_warp, mask, mask_graph;
 	cv::Mat mask0, mask1;

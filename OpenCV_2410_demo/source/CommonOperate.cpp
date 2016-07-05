@@ -569,7 +569,7 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	
 
 	dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 30);
-	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 30);
+	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 33);
 
 	mask = mask_erode.clone();
 }
@@ -824,4 +824,122 @@ void findboun_rect(cv::Mat mask, vector<cv::Point>&corners)
 	/*cout << "left  " << left << "right   " << right << endl;
 	cout << "top  " << top << "bottom   " << bottom << endl;
 	system("pause");*/
+}
+
+
+
+cv::Mat calcgradient(const cv::Mat& img)
+{
+	cv::Mat image_gray;
+	cv::Mat result(img.size(), CV_64FC1);
+	if (img.channels() != 1)
+	{
+		cvtColor(img, image_gray, CV_BGR2GRAY);
+	}
+	else
+	{
+		image_gray = img;
+	}
+	
+	image_gray.convertTo(image_gray, CV_64FC1);
+	double tmp = 0;
+	int rows = image_gray.rows - 1;
+	int cols = image_gray.cols - 1;
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			double dx = image_gray.at<double>(i, j + 1) - image_gray.at<double>(i, j);
+			double dy = image_gray.at<double>(i + 1, j) - image_gray.at<double>(i, j);
+			double ds = std::sqrt((dx*dx + dy*dy)/2);
+			result.at<double>(i, j) = ds;
+		}
+	}
+	
+	return result;
+}
+
+
+
+
+double addROIPix(cv::Mat image, cv::Mat mask)
+{
+	cv::Mat gray;
+	int sum_nonzero_Pix=0;
+
+	if (image.channels()!=1)
+	{
+		cvtColor(image, gray, CV_BGR2GRAY);
+	}
+	
+	else
+	{
+		gray = image.clone();
+	}
+	
+	assert(gray.size == mask.size);
+	double sum = 0.0;
+
+
+	vector<double>gradient_vec;
+	for (int i = 0; i < mask.rows; i++)
+	{
+		for (int j = 0; j < mask.cols; j++)
+		{
+
+			if (mask.at<uchar>(i,j)==255)
+			{
+				gradient_vec.push_back(abs(gray.at<double>(i, j)));
+				
+			}
+		}
+	}
+
+	sort(gradient_vec.begin(),gradient_vec.end());
+
+	int num = gradient_vec.size()*0.3;
+
+	for (int i = gradient_vec.size(); i > gradient_vec.size()-num; i--)
+	{
+		sum += gradient_vec[i-1];
+		sum_nonzero_Pix++;
+	}
+
+
+	return sum / num;
+}
+
+
+cv::Mat getMaskcontour(cv::Mat mask,int width)
+{
+	cv::Mat mask_small,mask_big;
+	erode(mask, mask_small, Mat(), Point(-1, -1), width+2);
+	erode(mask, mask_big, Mat(), Point(-1, -1), width+1);
+
+	cv::Mat result = mask_big - mask_small;
+	return result;
+
+}
+
+
+void SubMatrix(cv::Mat matrix1, cv::Mat matrix2,cv::Mat& result)
+{
+	cv::Mat temp(matrix1.size(), CV_64FC1);
+	for (int i = 0; i < matrix1.rows;i++)
+	{
+		for (int j = 0; j < matrix1.rows;j++)
+		{
+			temp.at<double>(i, j) = matrix1.at<double>(i, j) - matrix2.at<double>(i, j);
+			
+			/*if (temp.at<double>(i, j)>100)
+			{
+				cout << " "<<i  << "  "<< j << endl;
+				system("pause");
+			}*/
+		
+		}
+	}
+	result = temp.clone();
+
+
 }

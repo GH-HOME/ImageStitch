@@ -30,6 +30,9 @@
     <ClCompile Include="source\MyImageStitch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\RobustMatcher.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\CommonOperate.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\MyImageStitch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RobustMatcher.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

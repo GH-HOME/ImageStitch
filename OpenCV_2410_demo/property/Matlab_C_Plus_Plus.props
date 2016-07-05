@@ -3,9 +3,9 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <ExecutablePath>E:\Program Files\MATLAB\R2014a\bin\win64;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>E:\Program Files\MATLAB\R2014a\extern\include;E:\Program Files\MATLAB\R2014a\extern\include\win64;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Program Files\MATLAB\R2014a\extern\lib\win64\microsoft;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>D:\Program Files\MATLAB\R2014a\bin\win64;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>D:\Program Files\MATLAB\R2014a\extern\include;D:\Program Files\MATLAB\R2014a\extern\include\win64;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Program Files\MATLAB\R2014a\extern\lib\win64\microsoft;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>

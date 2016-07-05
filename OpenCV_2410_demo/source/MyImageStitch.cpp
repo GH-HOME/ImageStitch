@@ -54,7 +54,7 @@ cv::Mat ImageStitch(vector<cv::Mat>image_warpeds, vector<cv::Mat>mask_warpeds, v
 
 			Rect test = resultRoi(corners, sizes);
 			float blend_width = sqrt(static_cast<float>(dst_sz.area())) * blend_strength / 100.f;
-			cout << "blend_width    " << blend_width << endl;
+			//cout << "blend_width    " << blend_width << endl;
 			if (blend_width < 1.f)
 				blender = Blender::createDefault(Blender::NO, try_gpu);
 			else if (blend_type == Blender::MULTI_BAND)

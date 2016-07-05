@@ -53,6 +53,10 @@ void findcorners(cv::Mat image, int num_corners, vector<cv::Point>&corners);
 Rect findRect(vector<cv::Point>corners);
 cv::Mat circleMatrix(int radius);
 void findboun_rect(cv::Mat mask, vector<cv::Point>&corners);
+cv::Mat calcgradient(const cv::Mat& img);
+cv::Mat getMaskcontour(cv::Mat mask, int width);
+double addROIPix(cv::Mat image, cv::Mat mask);
+void SubMatrix(cv::Mat matrix1, cv::Mat matrix2, cv::Mat& result);
 #endif
 
 
