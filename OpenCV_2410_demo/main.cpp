@@ -155,11 +155,13 @@ cv::Mat blending(cv::Mat image0, cv::Mat image1)
 int main(int argc, char *argv[])
 {
 	
-	string videoname = "output6.avi";
-	string videoname3 = ".//2//left.avi";
-	string videoname4 = ".//2//right.avi";
-	string videoname1 = ".//2//outleft.avi";
-	string videoname2 = ".//2//outright.avi";
+	string videoname = "output2.avi";
+	string videoname3 = ".//15//left.avi";
+	string videoname4 = ".//15//right.avi";
+	string videoname2 = ".//15//leftoutbundle.avi";
+	string videoname1 = ".//15//rightoutbundle.avi";
+	//string videoname2 = ".//14//outleft.avi";
+	//string videoname1 = ".//14//outright.avi";
 	printf("Read Video\n");
 	cout << "now read video..." << videoname1 << endl;
 	cv::VideoCapture capture(videoname1);
@@ -257,12 +259,14 @@ int main(int argc, char *argv[])
 		addImagegap(frame_copy1, 40, 40, image1_gap);
 		addImagegap(frame_copy2, 40, 40, image2_gap);
 
-		//if (frame_count>93 && frame_count<293)
+		cv::Mat resultIM;
+		//if (frame_count>65 && frame_count<290)
 		{
-			cv::Mat resultIM = stitchgapIm(image1_gap, image2_gap);
+			resultIM = stitchgapIm(image1_gap, image2_gap);
+			outVideoWriter << resultIM;
 		}
 		
-		//outVideoWriter << resultIM;
+		
 		printf("%04d\b\b\b\b", frame_count);
 		frame_count++;
 
@@ -304,8 +308,8 @@ cv::Mat stitchgapIm(cv::Mat image0, cv::Mat image1)
 
 
 	//method1
-	erode(mask0, mask0_e, Mat(), Point(-1, -1), 20);
-	erode(mask1, mask1_e, Mat(), Point(-1, -1), 20);
+	erode(mask0, mask0_e, Mat(), Point(-1, -1), 12);
+	erode(mask1, mask1_e, Mat(), Point(-1, -1), 12);
 	cv::Mat allmask = mask0_e | mask1_e;
 	cv::Mat graph_mask0 = allmask - mask1_e;
 	cv::Mat graph_mask1 = allmask - graph_mask0;

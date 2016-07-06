@@ -569,7 +569,7 @@ void getImageNon_ZeroMask(cv::Mat image, cv::Mat &mask)
 	
 
 	dilate(mask_erode, mask_dilate, Mat(), Point(-1, -1), 30);
-	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 33);
+	erode(mask_dilate, mask_erode, Mat(), Point(-1, -1), 30);
 
 	mask = mask_erode.clone();
 }
@@ -897,7 +897,7 @@ double addROIPix(cv::Mat image, cv::Mat mask)
 
 	sort(gradient_vec.begin(),gradient_vec.end());
 
-	int num = gradient_vec.size()*0.3;
+	int num = gradient_vec.size()*0.7;
 
 	for (int i = gradient_vec.size(); i > gradient_vec.size()-num; i--)
 	{

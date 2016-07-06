@@ -56,7 +56,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="property\ProjectPros.props" />
     <Import Project="property\CompileErrorRepair.props" />
-    <Import Project="property\opencv2410.props" />
+    <Import Project="property\opencv_2413_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
