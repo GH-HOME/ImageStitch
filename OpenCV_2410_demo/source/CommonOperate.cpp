@@ -897,7 +897,7 @@ double addROIPix(cv::Mat image, cv::Mat mask)
 
 	sort(gradient_vec.begin(),gradient_vec.end());
 
-	int num = gradient_vec.size()*0.7;
+	int num = gradient_vec.size();
 
 	for (int i = gradient_vec.size(); i > gradient_vec.size()-num; i--)
 	{
@@ -913,8 +913,8 @@ double addROIPix(cv::Mat image, cv::Mat mask)
 cv::Mat getMaskcontour(cv::Mat mask,int width)
 {
 	cv::Mat mask_small,mask_big;
-	erode(mask, mask_small, Mat(), Point(-1, -1), width+2);
-	erode(mask, mask_big, Mat(), Point(-1, -1), width+1);
+	erode(mask, mask_small, Mat(), Point(-1, -1), width+3);
+	erode(mask, mask_big, Mat(), Point(-1, -1), width+2);
 
 	cv::Mat result = mask_big - mask_small;
 	return result;

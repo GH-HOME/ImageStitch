@@ -156,12 +156,12 @@ int main(int argc, char *argv[])
 {
 	
 	string videoname = "output2.avi";
-	string videoname3 = ".//15//left.avi";
-	string videoname4 = ".//15//right.avi";
-	string videoname2 = ".//15//leftoutbundle.avi";
-	string videoname1 = ".//15//rightoutbundle.avi";
-	//string videoname2 = ".//14//outleft.avi";
-	//string videoname1 = ".//14//outright.avi";
+	string videoname3 = ".//14//left.avi";
+	string videoname4 = ".//14//right.avi";
+	string videoname2 = ".//14//leftout.avi";
+	string videoname1 = ".//14//rightout.avi";
+	//string videoname2 = ".//11//outleft.avi";
+	//string videoname1 = ".//11//outright.avi";
 	printf("Read Video\n");
 	cout << "now read video..." << videoname1 << endl;
 	cv::VideoCapture capture(videoname1);
@@ -233,17 +233,12 @@ int main(int argc, char *argv[])
 		{
 			min_gradient_all = sum_gradient2;
 		}
-
-
-		
-
-		
+	
 	}
-
 	
 	min_gradient_all = min_gradient_all / (640.0 * 360.0);
 	max_gradient_all /= (640.0 * 360.0);
-	//min_gradient_all = max_gradient_all - min_gradient_all;
+	max_gradient_all = max_gradient_all - min_gradient_all;
 	min_gradient_all = 0.0;
 
 	cout<<"max_gradient_all  " << max_gradient_all << endl;
